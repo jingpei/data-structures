@@ -5,10 +5,13 @@ describe('tree', function() {
     tree = Tree();
   });
 
-  it('should have methods named "addChild" and "contains", and a property named "value"', function() {
+  it('should have methods named "addChild", "contains", "removeFromParent", and "traverse", and propertie named "value" and "parent"', function() {
     expect(tree.addChild).to.be.a("function");
     expect(tree.contains).to.be.a("function");
+    expect(tree.removeFromParent).to.be.a("function");
+    expect(tree.traverse).to.be.a("function");
     expect(tree.hasOwnProperty("value")).to.equal(true);
+    expect(tree.hasOwnProperty("parent")).to.equal(true);
   });
 
   it('should add children to the tree', function() {
@@ -41,4 +44,28 @@ describe('tree', function() {
     expect(tree.contains(8)).to.equal(true);
   });
 
+  it('should return the child tree that is removed from the parent', function(){
+    tree.addChild(5);
+    tree.addChild(6);
+    tree.children[0].addChild(7);
+    tree.children[1].addChild(8);
+    var removed = tree.removeFromParent(6)
+    expect(removed).to.equal(Tree(6).addChild(8));
+    expect(tree.contains(6)).to.equal(false);
+  });
+
+  it('should perform callback on each child Tree object', function(){
+    tree.addChild(5);
+    tree.addChild(6);
+    tree.children[0].addChild(7);
+    tree.children[1].addChild(8);
+    var traverseFunc = function(tree){
+      tree.value = tree.value + 1;
+    }
+    tree.traverse(traverseFunc);
+    expect(tree.children[0].value).to.equal(6);
+    expect(tree.children[1].value).to.equal(7);
+    expect(tree.children[0].children[0].value).to.equal(8);
+    expect(tree.children[1].children[0].value).to.equal(9);
+  })
 });
